@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الاختبارات</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            text-align: right;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            color: white;
+            margin-left: 5px;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+        }
+
+        .btn-questions {
+            background: #17a2b8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .modal-footer button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 إدارة الاختبارات</h1>
+            <a href="teacher-dashboard.html" class="back-btn">← لوحة التحكم</a>
+        </div>
+
+        <div class="panel">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>الاختبارات الخاصة بك</h2>
+                <button class="add-btn" onclick="openModal()">➕ إضافة اختبار جديد</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>اسم الاختبار</th>
+                        <th>الوصف</th>
+                        <th>المدة (دقيقة)</th>
+                        <th>درجة النجاح</th>
+                        <th>تاريخ الإنشاء</th>
+                        <th>إجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="examsBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center">جاري التحميل...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="examModal">
+        <div class="modal-content">
+            <h3 id="modalTitle">إضافة اختبار</h3>
+            <form onsubmit="saveExam(event)">
+                <div class="form-group">
+                    <label>عنوان الاختبار</label>
+                    <input type="text" id="title" required>
+                </div>
+                <div class="form-group">
+                    <label>الوصف (أو اسم المادة)</label>
+                    <input type="text" id="description">
+                </div>
+                <div class="form-group">
+                    <label>المدة (دقيقة)</label>
+                    <input type="number" id="duration" required value="60">
+                </div>
+                <div class="form-group">
+                    <label>درجة النجاح</label>
+                    <input type="number" id="passingScore" required value="50">
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">إلغاء</button>
+                    <button type="submit" class="btn-save">حفظ</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let exams = [];
+        let editingId = null;
+
+        window.onload = function () {
+            const token = localStorage.getItem('authToken');
+            if (!token) { window.location.href = 'login.html'; return; }
+            loadExams();
+        };
+
+        function loadExams() {
+            const token = localStorage.getItem('authToken');
+            fetch('/api/exams', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    exams = data;
+                    renderExams();
+                })
+                .catch(err => console.error(err));
+        }
+
+        function renderExams() {
+            const tbody = document.getElementById('examsBody');
+            if (exams.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px;">لا توجد اختبارات. ابدأ بإضافة واحد!</td></tr>';
+                return;
+            }
+            tbody.innerHTML = exams.map(e => `
+                <tr>
+                    <td>${e.title}</td>
+                    <td>${e.description || '-'}</td>
+                    <td>${e.duration}</td>
+                    <td>${e.passing_score}</td>
+                    <td>${new Date(e.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn-action btn-questions" onclick="manageQuestions(${e.id})">الأسئلة</button>
+                        <button class="btn-action btn-edit" onclick="editExam(${e.id})">تعديل</button>
+                        <button class="btn-action btn-delete" onclick="deleteExam(${e.id})">حذف</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'إضافة اختبار';
+            document.getElementById('title').value = '';
+            document.getElementById('description').value = '';
+            document.getElementById('duration').value = '60';
+            document.getElementById('passingScore').value = '50';
+            document.getElementById('examModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('examModal').classList.remove('active');
+        }
+
+        function editExam(id) {
+            const exam = exams.find(e => e.id === id);
+            if (!exam) return;
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'تعديل اختبار';
+            document.getElementById('title').value = exam.title;
+            document.getElementById('description').value = exam.description;
+            document.getElementById('duration').value = exam.duration;
+            document.getElementById('passingScore').value = exam.passing_score;
+            document.getElementById('examModal').classList.add('active');
+        }
+
+        function saveExam(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('authToken');
+            const data = {
+                title: document.getElementById('title').value,
+                description: document.getElementById('description').value,
+                duration: document.getElementById('duration').value,
+                passing_score: document.getElementById('passingScore').value
+            };
+
+            const url = editingId ? `/api/exams/${editingId}` : '/api/exams';
+            const method = editingId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(response => {
+                    if (response.message || response.examId || response.exam) {
+                        alert('تم الحفظ بنجاح');
+                        closeModal();
+                        loadExams();
+                    } else {
+                        alert('حدث خطأ');
+                    }
+                })
+                .catch(err => console.error(err));
+        }
+
+        function deleteExam(id) {
+            if (!confirm('هل أنت متأكد؟')) return;
+            const token = localStorage.getItem('authToken');
+            fetch(`/api/exams/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(() => loadExams());
+        }
+
+        function manageQuestions(id) {
+            // Save current exam ID and redirect to admin.html (which we will repurpose/update for Question Management)
+            localStorage.setItem('adminCurrentExamId', id);
+            window.location.href = 'admin.html';
+        }
+    </script>
+</body>
+
+</html>

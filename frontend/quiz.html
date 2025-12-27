@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ar">
+
+<head>
+    <meta charset="UTF-8">
+    <title>اختبار Accounting Applications</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="user-header">
+        <div class="user-info">
+            <a href="student-dashboard.html"
+                style="color: white; text-decoration: none; margin-left: 15px; font-size: 24px; transition: transform 0.2s;"
+                title="العودة للصفحة الرئيسية" onmouseover="this.style.transform='scale(1.2)'"
+                onmouseout="this.style.transform='scale(1)'">🏠</a>
+            <span id="welcomeText">مرحباً بك</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+    </div>
+
+    <div class="container">
+        <div style="background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h2 id="examTitle" style="color: #667eea; margin: 0 0 5px 0; font-size: 20px;">الاختبار</h2>
+            <p id="examSubject" style="color: #666; margin: 0; font-size: 14px;">المادة</p>
+        </div>
+
+        <div id="timer">الوقت المتبقي: 05:00</div>
+
+        <div id="studentInfo" style="display: none;">
+            <label>اسم الطالب:</label>
+            <input type="text" id="studentName" placeholder="اكتب اسمك" readonly>
+        </div>
+
+        <form id="quizForm">
+            <!-- Questions will be loaded dynamically here -->
+        </form>
+
+        <button type="button" class="submit-btn" onclick="submitQuiz()">إنهاء الاختبار</button>
+
+        <div id="result"></div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

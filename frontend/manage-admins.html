@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المسؤولين</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 28px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .panel h2 {
+            color: #333;
+            margin: 0;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .admins-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .admins-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .admins-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .admins-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #c82333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-header h3 {
+            color: #333;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ إدارة المسؤولين</h1>
+            <a href="admin-dashboard.html" class="back-btn">← الرجوع</a>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <h2>قائمة المسؤولين</h2>
+                <button class="add-btn" onclick="openAddModal()">➕ إضافة مسؤول جديد</button>
+            </div>
+
+            <table class="admins-table" id="adminsTable">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اسم المستخدم</th>
+                        <th>كلمة المرور</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="adminsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Admin Modal -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة مسؤول جديد</h3>
+                <button class="close-btn" onclick="closeModal()">×</button>
+            </div>
+
+            <form id="adminForm" onsubmit="saveAdmin(event)">
+                <div class="form-group">
+                    <label>الاسم الكامل</label>
+                    <input type="text" id="adminName" required placeholder="مثال: أحمد محمد">
+                </div>
+                <div class="form-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" id="adminUsername" required placeholder="example_admin">
+                </div>
+                <div class="form-group">
+                    <label>كلمة المرور</label>
+                    <input type="text" id="adminPassword" required placeholder="*******">
+                </div>
+
+                <button type="submit" class="save-btn">💾 حفظ المسؤول</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        window.onload = function () {
+            // Security Check
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const token = localStorage.getItem('authToken');
+
+            if (!token || currentUser.role !== 'super_admin') {
+                alert('عذراً، هذه الصفحة مخصصة للمسؤول الرئيسي فقط');
+                window.location.href = 'admin-dashboard.html';
+                return;
+            }
+
+            loadAdmins();
+        };
+
+        async function loadAdmins() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            const tbody = document.getElementById('adminsBody');
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">جاري التحميل...</td></tr>';
+
+            try {
+                const response = await fetch(`${API_URL}/admin/admins`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load admins');
+                }
+
+                const admins = await response.json();
+
+                if (admins.length === 0) {
+                    tbody.innerHTML = `
+    <tr>
+        <td colspan="4">
+            <div class="empty-state">
+                <p>لا يوجد مسؤولين فرعيين مضافين</p>
+            </div>
+        </td>
+    </tr>
+    `;
+                    return;
+                }
+
+                tbody.innerHTML = admins.map((admin) => `
+    <tr>
+        <td>${admin.name}</td>
+        <td>${admin.username}</td>
+        <td title="مشفر لأسباب أمنية">********</td>
+        <td>
+            <button class="btn-delete" onclick="deleteAdmin('${admin.id}')">🗑️ حذف</button>
+        </td>
+    </tr>
+    `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                tbody.innerHTML = `<tr>
+        <td colspan="4" style="color:red;text-align:center;">حدث خطأ أثناء تحميل البيانات</td>
+    </tr>`;
+            }
+        }
+
+        function openAddModal() {
+            document.getElementById('adminForm').reset();
+            document.getElementById('adminModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('adminModal').classList.remove('active');
+        }
+
+        async function saveAdmin(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('adminName').value;
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+            try {
+                const response = await fetch(`${API_URL}/admin/admins`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                    },
+                    body: JSON.stringify({
+                        name,
+                        username,
+                        password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to create admin');
+                }
+
+                closeModal();
+                loadAdmins();
+                alert('✅ تم إضافة المسؤول بنجاح');
+            } catch (error) {
+                alert('❌ ' + error.message);
+            }
+        }
+
+        async function deleteAdmin(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+                try {
+                    const response = await fetch(`${API_URL}/admin/admins/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        const data = await response.json();
+                        throw new Error(data.message || 'Failed to delete admin');
+                    }
+
+                    loadAdmins();
+                } catch (error) {
+                    alert('❌ ' + error.message);
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
