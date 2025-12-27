@@ -87,7 +87,6 @@ The system supports Role-Based Access Control (RBAC).
 ---
 
 ## 📞 Support (الدعم)
-
-If you encounter issues, ensure port `5000` is free and Node.js is installed.
+call me 
 <br>
 في حال واجهت مشكلة، تأكد من أن المنفذ 5000 غير مستخدم وأن Node.js مثبت.
