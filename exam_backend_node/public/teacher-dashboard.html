@@ -178,7 +178,7 @@
             const token = localStorage.getItem('authToken');
             const userType = localStorage.getItem('userType');
 
-            if (!token || userType !== 'admin') {
+            if (!token || !['admin', 'teacher', 'super_admin'].includes(userType)) {
                 window.location.href = 'login.html';
                 return;
             }
