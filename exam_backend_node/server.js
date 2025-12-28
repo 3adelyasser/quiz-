@@ -1,3 +1,15 @@
+// Polyfill for Object.hasOwn (for Node.js versions < 16.9.0)
+if (!Object.hasOwn) {
+    Object.defineProperty(Object, "hasOwn", {
+        value: function (object, property) {
+            return Object.prototype.hasOwnProperty.call(object, property);
+        },
+        configurable: true,
+        enumerable: false,
+        writable: true
+    });
+}
+
 require('dotenv').config();
 const bcrypt = require('bcryptjs');
 const app = require('./app');
