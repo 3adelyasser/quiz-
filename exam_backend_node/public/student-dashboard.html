@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة الطالب - نظام الاختبارات</title>
+    <title data-i18n="student_dashboard_title">لوحة الطالب - نظام الاختبارات</title>
     <style>
         * {
             margin: 0;
@@ -36,9 +36,13 @@
         }
 
         .welcome {
-            color: #666;
-            font-size: 16px;
+            color: #555;
+            font-size: 18px;
             margin-top: 5px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .logout-btn {
@@ -209,29 +213,29 @@
     <div class="container">
         <div class="header">
             <div>
-                <h1>🎓 لوحة الطالب</h1>
-                <p class="welcome" id="welcomeText">مرحباً بك</p>
+                <h1 data-i18n="student_header_title">🎓 لوحة الطالب</h1>
+                <p class="welcome" id="welcomeText">مرحباً</p>
             </div>
-            <button class="logout-btn" onclick="logout()">🚪 تسجيل الخروج</button>
+            <button class="logout-btn" onclick="logout()" data-i18n="logout_btn">🚪 تسجيل الخروج</button>
         </div>
 
         <div class="info-banner" id="infoBanner" style="display: none;">
-            <h3>💡 معلومة</h3>
+            <h3 data-i18n="info_title">💡 معلومة</h3>
             <p id="infoText"></p>
         </div>
 
         <div class="stats-bar">
             <div class="stat-item">
                 <div class="number" id="completedExams">0</div>
-                <div class="label">اختبارات مكتملة</div>
+                <div class="label" data-i18n="stat_completed_exams">اختبارات مكتملة</div>
             </div>
             <div class="stat-item">
                 <div class="number" id="avgScore">-</div>
-                <div class="label">المعدل</div>
+                <div class="label" data-i18n="stat_average">المعدل</div>
             </div>
             <div class="stat-item">
                 <div class="number" id="pendingGrades">0</div>
-                <div class="label">قيد التصحيح</div>
+                <div class="label" data-i18n="stat_pending">قيد التصحيح</div>
             </div>
         </div>
 
@@ -239,33 +243,35 @@
             <!-- Exams Card -->
             <div class="card">
                 <div class="card-icon">📝</div>
-                <h2>الاختبارات</h2>
-                <p>تصفح واختر من الاختبارات المتاحة لك</p>
-                <a href="exams-list.html" class="card-btn">عرض الاختبارات</a>
+                <h2 data-i18n="card_exams_title">الاختبارات</h2>
+                <p data-i18n="card_exams_desc">تصفح واختر من الاختبارات المتاحة لك</p>
+                <a href="exams-list.html" class="card-btn" data-i18n="card_exams_btn">عرض الاختبارات</a>
             </div>
 
             <!-- Results Card -->
             <div class="card">
                 <div class="card-icon">📊</div>
-                <h2>نتائجي</h2>
-                <p>شاهد نتائجك التفصيلية، الدرجات النهائية، وتعليقات المعلم على إجاباتك</p>
-                <a href="student-results.html" class="card-btn secondary">عرض النتائج</a>
+                <h2 data-i18n="card_results_title">نتائجي</h2>
+                <p data-i18n="card_results_desc">شاهد نتائجك التفصيلية، الدرجات النهائية، وتعليقات المعلم على إجاباتك
+                </p>
+                <a href="student-results.html" class="card-btn secondary" data-i18n="card_results_btn">عرض النتائج</a>
             </div>
         </div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         window.onload = function () {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
             const userType = localStorage.getItem('userType');
 
             if (!currentUser || userType !== 'student') {
-                alert('يجب تسجيل الدخول أولاً');
+                alert(window.t('must_login'));
                 window.location.href = 'login.html';
                 return;
             }
 
-            document.getElementById('welcomeText').textContent = `مرحباً ${currentUser.name} 👋`;
+            document.getElementById('welcomeText').textContent = `${window.t('welcome_prefix')} ${currentUser.name} 👋`;
             loadStats();
         };
 
@@ -299,13 +305,13 @@
                 if (pendingCount > 0) {
                     document.getElementById('infoBanner').style.display = 'block';
                     document.getElementById('infoText').textContent =
-                        `لديك ${pendingCount} اختبار قيد التصحيح. سيتم إشعارك عند الانتهاء من تصحيح الأسئلة المقالية.`;
+                        window.t('pending_grading_msg').replace('{count}', pendingCount);
                 }
             }
         }
 
         function logout() {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
+            if (confirm(window.t('logout_confirm'))) {
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('userType');
                 window.location.href = 'login.html';

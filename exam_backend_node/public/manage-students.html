@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الطلاب</title>
+    <title data-i18n="manage_students_title">إدارة الطلاب</title>
     <style>
         * {
             margin: 0;
@@ -274,34 +274,37 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>👥 إدارة الطلاب</h1>
-            <button class="btn btn-back" onclick="location.href='teacher-dashboard.html'">العودة للوحة التحكم</button>
+            <h1 data-i18n="manage_students_header">👥 إدارة الطلاب</h1>
+            <button class="btn btn-back" onclick="location.href='teacher-dashboard.html'"
+                data-i18n="btn_back_dashboard">العودة للوحة التحكم</button>
         </div>
 
         <div class="actions-bar">
-            <input type="text" class="search-box" id="searchBox" placeholder="🔍 البحث عن طالب...">
-            <button class="btn btn-success" onclick="openAddModal()">➕ إضافة طالب جديد</button>
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 البحث عن طالب..."
+                data-i18n="search_placeholder">
+            <button class="btn btn-success" onclick="openAddModal()" data-i18n="add_student_btn">➕ إضافة طالب
+                جديد</button>
         </div>
 
         <div class="content-card">
-            <h2>قائمة الطلاب</h2>
+            <h2 data-i18n="students_list_title">قائمة الطلاب</h2>
             <table id="studentsTable">
                 <thead>
                     <tr>
-                        <th>الرقم</th>
-                        <th>الاسم</th>
-                        <th>البريد الإلكتروني</th>
-                        <th>تاريخ التسجيل</th>
-                        <th>الاختبارات المكتملة</th>
-                        <th>المعدل</th>
-                        <th>الإجراءات</th>
+                        <th data-i18n="th_number">الرقم</th>
+                        <th data-i18n="th_name">الاسم</th>
+                        <th data-i18n="th_email">البريد الإلكتروني</th>
+                        <th data-i18n="th_registration_date">تاريخ التسجيل</th>
+                        <th data-i18n="th_completed_exams">الاختبارات المكتملة</th>
+                        <th data-i18n="th_average_score">المعدل</th>
+                        <th data-i18n="th_actions">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="studentsTableBody">
                     <tr>
                         <td colspan="7" class="empty-state">
                             <div class="empty-state-icon">⏳</div>
-                            <div>جاري تحميل البيانات...</div>
+                            <div data-i18n="loading_msg">جاري تحميل البيانات...</div>
                         </td>
                     </tr>
                 </tbody>
@@ -314,31 +317,35 @@
         <div class="modal-content">
             <div class="modal-header">
                 <span class="close" onclick="closeModal()">&times;</span>
-                <h2 id="modalTitle">إضافة طالب جديد</h2>
+                <h2 id="modalTitle" data-i18n="modal_add_student">إضافة طالب جديد</h2>
             </div>
             <form id="studentForm">
                 <input type="hidden" id="studentId">
                 <div class="form-group">
-                    <label for="studentName">الاسم الكامل *</label>
+                    <label for="studentName" data-i18n="label_full_name">الاسم الكامل *</label>
                     <input type="text" id="studentName" required placeholder="أدخل اسم الطالب">
                 </div>
                 <div class="form-group">
-                    <label for="studentEmail">البريد الإلكتروني *</label>
+                    <label for="studentEmail" data-i18n="label_email">البريد الإلكتروني *</label>
                     <input type="email" id="studentEmail" required placeholder="example@email.com">
                 </div>
                 <div class="form-group">
-                    <label for="studentPassword">كلمة المرور <span id="passwordHint">(اتركها فارغة للإبقاء على
-                            القديمة)</span></label>
-                    <input type="password" id="studentPassword" placeholder="كلمة المرور">
+                    <label for="studentPassword">
+                        <span data-i18n="label_password">كلمة المرور</span>
+                        <span id="passwordHint" data-i18n="password_hint">(اتركها فارغة للإبقاء على القديمة)</span>
+                    </label>
+                    <input type="password" id="studentPassword" placeholder="******">
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-cancel" onclick="closeModal()">إلغاء</button>
-                    <button type="submit" class="btn btn-success">حفظ</button>
+                    <button type="button" class="btn btn-cancel" onclick="closeModal()"
+                        data-i18n="btn_cancel">إلغاء</button>
+                    <button type="submit" class="btn btn-success" data-i18n="btn_save">حفظ</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         let students = [];
         let editMode = false;
@@ -347,7 +354,7 @@
             const token = localStorage.getItem('authToken');
             const userType = localStorage.getItem('userType');
 
-            if (!token || userType !== 'teacher') {
+            if (!token || userType !== 'admin') {
                 window.location.href = 'login.html';
                 return;
             }
@@ -363,11 +370,14 @@
                 );
                 renderStudents(filteredStudents);
             });
+
+            // Apply placeholder translations
+            document.getElementById('searchBox').placeholder = window.t('search_placeholder');
         };
 
         function loadStudents() {
             const token = localStorage.getItem('authToken');
-            fetch('/api/teacher/students', {
+            fetch('/api/admin/students', { // Changed to admin API
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -377,7 +387,7 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('فشل في تحميل البيانات');
+                    alert(window.t('fetch_error'));
                 });
         }
 
@@ -389,7 +399,7 @@
                     <tr>
                         <td colspan="7" class="empty-state">
                             <div class="empty-state-icon">📭</div>
-                            <div>لا توجد طلاب حالياً</div>
+                            <div>${window.t('no_students_msg')}</div>
                         </td>
                     </tr>
                 `;
@@ -406,8 +416,8 @@
                     <td>${student.averageScore ? student.averageScore.toFixed(1) : '-'}</td>
                     <td>
                         <div class="action-icons">
-                            <button class="icon-btn edit-btn" onclick="openEditModal(${student.id})" title="تعديل">✏️</button>
-                            <button class="icon-btn delete-btn" onclick="deleteStudent(${student.id})" title="حذف">🗑️</button>
+                            <button class="icon-btn edit-btn" onclick="openEditModal(${student.id})" title="${window.t('btn_edit')}">✏️</button>
+                            <button class="icon-btn delete-btn" onclick="deleteStudent(${student.id})" title="${window.t('btn_delete')}">🗑️</button>
                         </div>
                     </td>
                 </tr>
@@ -416,7 +426,7 @@
 
         function openAddModal() {
             editMode = false;
-            document.getElementById('modalTitle').textContent = 'إضافة طالب جديد';
+            document.getElementById('modalTitle').textContent = window.t('modal_add_student');
             document.getElementById('passwordHint').style.display = 'none';
             document.getElementById('studentForm').reset();
             document.getElementById('studentId').value = '';
@@ -429,7 +439,7 @@
             const student = students.find(s => s.id === studentId);
             if (!student) return;
 
-            document.getElementById('modalTitle').textContent = 'تعديل بيانات الطالب';
+            document.getElementById('modalTitle').textContent = window.t('modal_edit_student');
             document.getElementById('passwordHint').style.display = 'inline';
             document.getElementById('studentId').value = student.id;
             document.getElementById('studentName').value = student.name;
@@ -456,7 +466,7 @@
             if (password) data.password = password;
 
             const token = localStorage.getItem('authToken');
-            const url = editMode ? `/api/teacher/students/${studentId}` : '/api/teacher/students';
+            const url = editMode ? `/api/admin/students/${studentId}` : '/api/admin/students'; // Changed to admin API
             const method = editMode ? 'PUT' : 'POST';
 
             fetch(url, {
@@ -479,28 +489,28 @@
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('حدث خطأ في العملية');
+                    alert(window.t('action_error')); // You might need to add this key in lang.js if not present, otherwise use generic error
                 });
         });
 
         function deleteStudent(studentId) {
-            if (!confirm('هل أنت متأكد من حذف هذا الطالب؟\nسيتم حذف جميع النتائج والبيانات المرتبطة به.')) {
+            if (!confirm(window.t('confirm_delete_student'))) {
                 return;
             }
 
             const token = localStorage.getItem('authToken');
-            fetch(`/api/teacher/students/${studentId}`, {
+            fetch(`/api/admin/students/${studentId}`, { // Changed to admin API
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
                 .then(result => {
-                    alert(result.message || 'تم الحذف بنجاح');
+                    alert(result.message || window.t('delete_success'));
                     loadStudents();
                 })
                 .catch(err => {
                     console.error(err);
-                    alert('فشل في حذف الطالب');
+                    alert(window.t('delete_fail'));
                 });
         }
 

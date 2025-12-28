@@ -34,7 +34,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/exams', examRoutes);
 
 // Serve static files from '../frontend' directory
-const staticPath = path.join(__dirname, '../frontend');
+const staticPath = path.join(__dirname, 'public');
 app.use(express.static(staticPath));
 
 // Frontend routes

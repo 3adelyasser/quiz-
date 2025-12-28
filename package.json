@@ -1,0 +1,12 @@
+{
+    "name": "quiz-app-root",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "cd exam_backend_node && npm start",
+        "build": "cd exam_backend_node && npm install",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}

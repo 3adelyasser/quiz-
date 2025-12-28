@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة المسؤولين</title>
+    <title data-i18n="manage_admins_title">إدارة المسؤولين</title>
     <style>
         * {
             margin: 0;
@@ -238,23 +238,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛡️ إدارة المسؤولين</h1>
-            <a href="admin-dashboard.html" class="back-btn">← الرجوع</a>
+            <h1 data-i18n="manage_admins_header">🛡️ إدارة المسؤولين</h1>
+            <a href="admin-dashboard.html" class="back-btn" data-i18n="back_to_dashboard">← الرجوع</a>
         </div>
 
         <div class="panel">
             <div class="panel-header">
-                <h2>قائمة المسؤولين</h2>
-                <button class="add-btn" onclick="openAddModal()">➕ إضافة مسؤول جديد</button>
+                <h2 data-i18n="admins_list_title">قائمة المسؤولين</h2>
+                <button class="add-btn" onclick="openAddModal()" data-i18n="add_admin_btn">➕ إضافة مسؤول جديد</button>
             </div>
 
             <table class="admins-table" id="adminsTable">
                 <thead>
                     <tr>
-                        <th>الاسم</th>
-                        <th>اسم المستخدم</th>
-                        <th>كلمة المرور</th>
-                        <th>الإجراءات</th>
+                        <th data-i18n="th_name">الاسم</th>
+                        <th data-i18n="th_username">اسم المستخدم</th>
+                        <th data-i18n="th_password">كلمة المرور</th>
+                        <th data-i18n="th_actions">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="adminsBody"></tbody>
@@ -266,29 +266,30 @@
     <div class="modal" id="adminModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>إضافة مسؤول جديد</h3>
+                <h3 data-i18n="modal_add_admin_title">إضافة مسؤول جديد</h3>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
 
             <form id="adminForm" onsubmit="saveAdmin(event)">
                 <div class="form-group">
-                    <label>الاسم الكامل</label>
+                    <label data-i18n="label_full_name">الاسم الكامل</label>
                     <input type="text" id="adminName" required placeholder="مثال: أحمد محمد">
                 </div>
                 <div class="form-group">
-                    <label>اسم المستخدم</label>
+                    <label data-i18n="label_username">اسم المستخدم</label>
                     <input type="text" id="adminUsername" required placeholder="example_admin">
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
+                    <label data-i18n="label_password">كلمة المرور</label>
                     <input type="text" id="adminPassword" required placeholder="*******">
                 </div>
 
-                <button type="submit" class="save-btn">💾 حفظ المسؤول</button>
+                <button type="submit" class="save-btn" data-i18n="btn_save_admin">💾 حفظ المسؤول</button>
             </form>
         </div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         const API_URL = 'http://localhost:5000/api';
 
@@ -298,7 +299,7 @@
             const token = localStorage.getItem('authToken');
 
             if (!token || currentUser.role !== 'super_admin') {
-                alert('عذراً، هذه الصفحة مخصصة للمسؤول الرئيسي فقط');
+                alert(window.t('only_super_admin'));
                 window.location.href = 'admin-dashboard.html';
                 return;
             }
@@ -309,7 +310,7 @@
         async function loadAdmins() {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
             const tbody = document.getElementById('adminsBody');
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">جاري التحميل...</td></tr>';
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${window.t('loading')}</td></tr>`;
 
             try {
                 const response = await fetch(`${API_URL}/admin/admins`, {
@@ -329,7 +330,7 @@
     <tr>
         <td colspan="4">
             <div class="empty-state">
-                <p>لا يوجد مسؤولين فرعيين مضافين</p>
+                <p>${window.t('no_admins_msg')}</p>
             </div>
         </td>
     </tr>
@@ -343,14 +344,14 @@
         <td>${admin.username}</td>
         <td title="مشفر لأسباب أمنية">********</td>
         <td>
-            <button class="btn-delete" onclick="deleteAdmin('${admin.id}')">🗑️ حذف</button>
+            <button class="btn-delete" onclick="deleteAdmin('${admin.id}')">${window.t('btn_delete')}</button>
         </td>
     </tr>
     `).join('');
             } catch (error) {
                 console.error('Error:', error);
                 tbody.innerHTML = `<tr>
-        <td colspan="4" style="color:red;text-align:center;">حدث خطأ أثناء تحميل البيانات</td>
+        <td colspan="4" style="color:red;text-align:center;">${window.t('fetch_error')}</td>
     </tr>`;
             }
         }
@@ -395,14 +396,14 @@
 
                 closeModal();
                 loadAdmins();
-                alert('✅ تم إضافة المسؤول بنجاح');
+                alert(window.t('admin_added_success'));
             } catch (error) {
                 alert('❌ ' + error.message);
             }
         }
 
         async function deleteAdmin(id) {
-            if (confirm('هل أنت متأكد من حذف هذا المسؤول؟')) {
+            if (confirm(window.t('confirm_delete_admin'))) {
                 const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
                 try {

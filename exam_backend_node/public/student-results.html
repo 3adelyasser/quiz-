@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نتائجي - نظام الاختبارات</title>
+    <title data-i18n="my_results_title">نتائجي - نظام الاختبارات</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .final-results {
@@ -136,36 +136,37 @@
                 style="color: white; text-decoration: none; margin-left: 15px; font-size: 24px; transition: transform 0.2s;"
                 title="العودة للصفحة الرئيسية" onmouseover="this.style.transform='scale(1.2)'"
                 onmouseout="this.style.transform='scale(1)'">🏠</a>
-            <span id="welcomeText">مرحباً بك</span>
+            <span id="welcomeText" data-i18n="welcome_user">مرحباً بك</span>
         </div>
-        <button class="logout-btn" onclick="logout()">تسجيل الخروج</button>
+        <button class="logout-btn" onclick="logout()" data-i18n="logout_btn">تسجيل الخروج</button>
     </div>
 
     <div class="container">
-        <h1>📊 نتائجي</h1>
+        <h1 data-i18n="my_results_header">📊 نتائجي</h1>
 
         <div id="resultsContainer"></div>
 
-        <a href="student-dashboard.html" class="btn-back">العودة للصفحة الرئيسية</a>
+        <a href="student-dashboard.html" class="btn-back" data-i18n="back_to_dashboard">العودة للصفحة الرئيسية</a>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         window.onload = function () {
             const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
             const userType = localStorage.getItem('userType');
 
             if (!currentUser || userType !== 'student') {
-                alert('يجب تسجيل الدخول أولاً');
+                alert(window.t('must_login'));
                 window.location.href = 'login.html';
                 return;
             }
 
-            document.getElementById('welcomeText').textContent = `مرحباً ${currentUser.name} 👋`;
+            document.getElementById('welcomeText').textContent = `${window.t('welcome_user')} ${currentUser.name} 👋`;
             loadResults();
         };
 
         function logout() {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
+            if (confirm(window.t('confirm_logout'))) {
                 localStorage.removeItem('currentUser');
                 localStorage.removeItem('userType');
                 window.location.href = 'login.html';
@@ -182,8 +183,8 @@
             if (studentResults.length === 0) {
                 document.getElementById('resultsContainer').innerHTML = `
                     <div class="pending-message">
-                        <h3>لم تقم بحل الاختبار بعد</h3>
-                        <p>قم بحل الاختبار أولاً لمشاهدة نتائجك</p>
+                        <h3>${window.t('no_results_msg')}</h3>
+                        <p>${window.t('solve_exam_first')}</p>
                     </div>
                 `;
                 return;
@@ -204,29 +205,29 @@
 
             let html = `
                 <div class="final-results">
-                    <h2>النتيجة النهائية</h2>
+                    <h2 data-i18n="final_result_title">${window.t('final_result_title')}</h2>
                     
                     <div class="score-breakdown">
-                        <p>📝 الدرجة التلقائية: ${result.autoScore} / ${result.totalAuto}</p>
+                        <p>${window.t('auto_score_label')} ${result.autoScore} / ${result.totalAuto}</p>
             `;
 
             if (hasEssays) {
                 if (isGraded) {
                     html += `
-                        <p>✍️ درجة الأسئلة المقالية: ${totalEssayScore.toFixed(1)}</p>
+                        <p>${window.t('essay_score_label')} ${totalEssayScore.toFixed(1)}</p>
                         <hr style="border: none; border-top: 2px solid #e0e0e0; margin: 15px 0;">
-                        <p class="final">🎯 الدرجة النهائية: ${finalScore.toFixed(1)}</p>
+                        <p class="final">${window.t('final_score_label')} ${finalScore.toFixed(1)}</p>
                     `;
                 } else {
                     html += `
-                        <p style="color: #ff9800;">📝 الأسئلة المقالية قيد التصحيح...</p>
+                        <p style="color: #ff9800;">${window.t('essay_pending_msg')}</p>
                     `;
                 }
             } else {
                 html += `
-                    <p class="final">🎯 الدرجة النهائية: ${finalScore.toFixed(1)} <span style="font-size: 0.8em; color: #666;">من ${result.examTotalScore || 100}</span></p>
+                    <p class="final">${window.t('final_score_label')} ${finalScore.toFixed(1)} <span style="font-size: 0.8em; color: #666;">${window.t('out_of')} ${result.examTotalScore || 100}</span></p>
                     <div class="status-badge ${result.passed ? 'status-pass' : 'status-fail'}">
-                        ${result.passed ? '🎉 ناجح' : '❌ راسب'}
+                        ${result.passed ? window.t('status_pass') : window.t('status_fail')}
                     </div>
                 `;
             }
@@ -239,7 +240,7 @@
             if (hasEssays && isGraded) {
                 html += `
                     <div class="teacher-feedback">
-                        <h3>📝 تصحيح المعلم</h3>
+                        <h3>${window.t('teacher_feedback_title')}</h3>
                 `;
 
                 result.essayGrades.forEach(grade => {
@@ -247,8 +248,8 @@
                     if (grade.grade != null) {
                         html += `
                             <div class="essay-grade">
-                                <strong>س${grade.questionId}: ${essay?.questionText || ''}</strong>
-                                <p>درجتك: ${grade.grade} نقطة</p>
+                                <strong>Q${grade.questionId}: ${essay?.questionText || ''}</strong>
+                                <p>${window.t('your_score')} ${grade.grade}</p>
                                 ${grade.comment ? `<p class="comment">💬 ${grade.comment}</p>` : ''}
                             </div>
                         `;
@@ -264,10 +265,10 @@
             if (hasEssays && !isGraded) {
                 html += `
                     <div class="pending-message">
-                        <h3>⏳ جاري تصحيح الأسئلة المقالية</h3>
-                        <p>سيتم إشعارك عند الانتهاء من التصحيح</p>
+                        <h3>${window.t('pending_grading_title')}</h3>
+                        <p>${window.t('pending_grading_msg')}</p>
                         <p style="margin-top: 10px; font-size: 14px;">
-                            تاريخ التسليم: ${new Date(result.timestamp).toLocaleString('ar-EG')}
+                            ${window.t('submission_date')} ${new Date(result.timestamp).toLocaleString('ar-EG')}
                         </p>
                     </div>
                 `;

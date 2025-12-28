@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الاختبارات المتاحة</title>
+    <title data-i18n="available_exams_title">الاختبارات المتاحة</title>
     <style>
         * {
             margin: 0;
@@ -100,12 +100,13 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📚 الاختبارات المتاحة</h1>
-            <a href="student-dashboard.html" class="back-btn">← الرجوع</a>
+            <h1 data-i18n="available_exams_header">📚 الاختبارات المتاحة</h1>
+            <a href="student-dashboard.html" class="back-btn" data-i18n="back_to_dashboard">← الرجوع</a>
         </div>
         <div class="exams-grid" id="examsGrid"></div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         window.onload = function () {
             const token = localStorage.getItem('authToken');
@@ -122,19 +123,19 @@
                 .then(exams => {
                     const grid = document.getElementById('examsGrid');
                     if (exams.length === 0) {
-                        grid.innerHTML = '<div class="empty-state"><h3>لا توجد اختبارات متاحة حالياً</h3></div>';
+                        grid.innerHTML = `<div class="empty-state"><h3>${window.t('no_exams_msg')}</h3></div>`;
                         return;
                     }
 
                     grid.innerHTML = exams.map(exam => `
                     <div class="exam-card">
                         <div class="exam-title">${exam.title}</div>
-                        <div style="color: #666; margin-bottom: 15px;">${exam.description || 'لا يوجد وصف'}</div>
+                        <div style="color: #666; margin-bottom: 15px;">${exam.description || window.t('no_description', 'لا يوجد وصف')}</div>
                         <div style="display: flex; justify-content: space-between; background: #f9f9f9; padding: 10px; border-radius: 8px;">
-                            <span>⏱️ ${exam.duration} دقيقة</span>
-                            <span>🎯 النجاح: ${exam.passing_score}</span>
+                            <span>${window.t('exam_duration')} ${exam.duration} ${window.t('minutes')}</span>
+                            <span>${window.t('passing_score')} ${exam.passing_score}</span>
                         </div>
-                        <button class="start-btn" onclick="startExam(${exam.id})">▶️ بدء الاختبار</button>
+                        <button class="start-btn" onclick="startExam(${exam.id})">${window.t('start_exam_btn')}</button>
                     </div>
                 `).join('');
                 })

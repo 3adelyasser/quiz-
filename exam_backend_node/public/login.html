@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - نظام الاختبارات</title>
+    <title data-i18n="login_title">تسجيل الدخول - نظام الاختبارات</title>
     <style>
         * {
             margin: 0;
@@ -191,13 +191,13 @@
 <body>
     <div class="login-container">
         <div class="logo">
-            <h1>🎓 نظام الاختبارات</h1>
-            <p>مرحباً بك في نظام الاختبارات الإلكتروني</p>
+            <h1 data-i18n="system_title">🎓 نظام الاختبارات</h1>
+            <p data-i18n="welcome_msg">مرحباً بك في نظام الاختبارات الإلكتروني</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('student')">طالب</button>
-            <button class="tab" onclick="switchTab('admin')">مسؤول</button>
+            <button class="tab active" onclick="switchTab('student')" data-i18n="student_tab">طالب</button>
+            <button class="tab" onclick="switchTab('admin')" data-i18n="admin_tab">مسؤول</button>
         </div>
 
         <div id="message" class="message"></div>
@@ -206,18 +206,18 @@
         <div id="student-section" class="form-section active">
             <form id="studentLoginForm" onsubmit="studentLogin(event)">
                 <div class="form-group">
-                    <label>البريد الإلكتروني</label>
+                    <label data-i18n="email_label">البريد الإلكتروني</label>
                     <input type="email" id="studentEmail" placeholder="student@test.com" required
                         value="student@test.com">
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
+                    <label data-i18n="password_label">كلمة المرور</label>
                     <input type="password" id="studentPassword" placeholder="••••••" required value="123456">
                 </div>
-                <button type="submit" class="btn">🔐 تسجيل الدخول</button>
+                <button type="submit" class="btn" data-i18n="student_login_btn">🔐 تسجيل الدخول</button>
             </form>
             <div class="link">
-                ليس لديك حساب؟ <a href="register.html">سجل الآن</a>
+                <span data-i18n="no_account">ليس لديك حساب؟</span> <a href="register.html" data-i18n="register_now">سجل الآن</a>
             </div>
         </div>
 
@@ -225,18 +225,19 @@
         <div id="admin-section" class="form-section">
             <form id="adminLoginForm" onsubmit="adminLogin(event)">
                 <div class="form-group">
-                    <label>البريد الإلكتروني (للمعلمين)</label>
-                    <input type="email" id="adminUsername" placeholder="teacher@school.com" required>
+                    <label data-i18n="email_label">البريد الإلكتروني</label>
+                    <input type="email" id="adminUsername" placeholder="teacher@school.com" data-i18n="teacher_email_placeholder" required>
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
+                    <label data-i18n="password_label">كلمة المرور</label>
                     <input type="password" id="adminPassword" placeholder="••••••" required value="admin123">
                 </div>
-                <button type="submit" class="btn">🔑 دخول المسؤول</button>
+                <button type="submit" class="btn" data-i18n="admin_login_btn">🔑 دخول المسؤول</button>
             </form>
         </div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         function switchTab(type) {
             const tabs = document.querySelectorAll('.tab');
@@ -280,7 +281,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.token) {
-                        showMessage('✅ تم تسجيل الدخول بنجاح! جاري التحويل...', 'success');
+                        showMessage(window.t('login_success'), 'success');
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentUser', JSON.stringify({
                             name: data.student ? data.student.name : 'Student',
@@ -293,12 +294,12 @@
                             window.location.href = 'student-dashboard.html';
                         }, 1000);
                     } else {
-                        showMessage('❌ ' + (data.message || 'فشل تسجيل الدخول'), 'error');
+                        showMessage('❌ ' + (data.message || window.t('login_fail')), 'error');
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    showMessage('❌ حدث خطأ في الاتصال بالخادم', 'error');
+                    showMessage(window.t('server_error'), 'error');
                 });
         }
 
@@ -316,7 +317,7 @@
                 .then(res => res.json())
                 .then(data => {
                     if (data.token) {
-                        showMessage('✅ تم تسجيل دخول المسؤول! جاري التحويل...', 'success');
+                        showMessage(window.t('admin_login_success'), 'success');
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentUser', JSON.stringify({
                             name: data.name,
@@ -333,12 +334,12 @@
                             }
                         }, 1000);
                     } else {
-                        showMessage('❌ ' + (data.message || 'فشل تسجيل الدخول'), 'error');
+                        showMessage('❌ ' + (data.message || window.t('login_fail')), 'error');
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    showMessage('❌ حدث خطأ في الاتصال بالخادم', 'error');
+                    showMessage(window.t('server_error'), 'error');
                 });
         }
     </script>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل حساب جديد - نظام الاختبارات</title>
+    <title data-i18n="register_title">تسجيل حساب جديد - نظام الاختبارات</title>
     <style>
         * {
             margin: 0;
@@ -237,13 +237,13 @@
 <body>
     <div class="register-container">
         <div class="logo">
-            <h1>📝 تسجيل حساب جديد</h1>
-            <p>انضم إلينا كطالب أو كمعلم</p>
+            <h1 data-i18n="register_header">📝 تسجيل حساب جديد</h1>
+            <p data-i18n="register_subtitle">انضم إلينا كطالب أو كمعلم</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('student')">طالب</button>
-            <button class="tab" onclick="switchTab('teacher')">معلم</button>
+            <button class="tab active" onclick="switchTab('student')" data-i18n="student_tab">طالب</button>
+            <button class="tab" onclick="switchTab('teacher')" data-i18n="teacher_tab">معلم</button>
         </div>
 
         <div id="message" class="message"></div>
@@ -252,24 +252,26 @@
         <div id="student-section" class="form-section active">
             <form onsubmit="registerUser(event, 'student')">
                 <div class="form-group">
-                    <label>الاسم الكامل</label>
+                    <label data-i18n="full_name_label">الاسم الكامل</label>
                     <input type="text" id="studentName" required minlength="3">
                 </div>
                 <div class="form-group">
-                    <label>البريد الإلكتروني</label>
+                    <label data-i18n="email_label">البريد الإلكتروني</label>
                     <input type="email" id="studentEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
+                    <label data-i18n="password_label">كلمة المرور</label>
                     <input type="password" id="studentPassword" required minlength="6">
                 </div>
                 <div class="form-group">
-                    <label>اختر المعلمين (اختياري)</label>
-                    <div id="teachersLoading" class="loading-spinner">⏳ جارٍ تحميل قائمة المعلمين...</div>
+                    <label data-i18n="choose_teachers_label">اختر المعلمين (اختياري)</label>
+                    <div id="teachersLoading" class="loading-spinner" data-i18n="loading_teachers">⏳ جارٍ تحميل قائمة
+                        المعلمين...</div>
                     <div id="teachersGrid" class="teachers-grid" style="display: none;"></div>
-                    <p class="helper-text">💡 يمكنك اختيار معلم واحد أو أكثر، أو تخطي هذه الخطوة والاختيار لاحقاً</p>
+                    <p class="helper-text" data-i18n="teachers_helper">💡 يمكنك اختيار معلم واحد أو أكثر، أو تخطي هذه
+                        الخطوة والاختيار لاحقاً</p>
                 </div>
-                <button type="submit" class="btn">✅ تسجيل كطالب</button>
+                <button type="submit" class="btn" data-i18n="register_student_btn">✅ تسجيل كطالب</button>
             </form>
         </div>
 
@@ -277,27 +279,29 @@
         <div id="teacher-section" class="form-section">
             <form onsubmit="registerUser(event, 'teacher')">
                 <div class="form-group">
-                    <label>الاسم الكامل</label>
+                    <label data-i18n="full_name_label">الاسم الكامل</label>
                     <input type="text" id="teacherName" required minlength="3">
                 </div>
                 <div class="form-group">
-                    <label>البريد الإلكتروني</label>
+                    <label data-i18n="email_label">البريد الإلكتروني</label>
                     <input type="email" id="teacherEmail" required>
                 </div>
                 <div class="form-group">
-                    <label>كلمة المرور</label>
+                    <label data-i18n="password_label">كلمة المرور</label>
                     <input type="password" id="teacherPassword" required minlength="6">
                 </div>
-                <button type="submit" class="btn"
-                    style="background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);">👨‍🏫 تسجيل كمعلم</button>
+                <button type="submit" class="btn" style="background: linear-gradient(135deg, #FF6B6B 0%, #EE5253 100%);"
+                    data-i18n="register_teacher_btn">👨‍🏫 تسجيل كمعلم</button>
             </form>
         </div>
 
         <div class="link">
-            لديك حساب بالفعل؟ <a href="login.html">سجل الدخول</a>
+            <span data-i18n="already_have_account">لديك حساب بالفعل؟</span> <a href="login.html"
+                data-i18n="login_link">سجل الدخول</a>
         </div>
     </div>
 
+    <script src="js/lang.js"></script>
     <script>
         let availableTeachers = [];
 
@@ -315,7 +319,7 @@
                 })
                 .catch(err => {
                     console.error('Error loading teachers:', err);
-                    document.getElementById('teachersLoading').innerHTML = '❌ فشل تحميل قائمة المعلمين';
+                    document.getElementById('teachersLoading').innerHTML = window.t('fail_load_teachers');
                 });
         }
 
@@ -324,7 +328,7 @@
             const gridDiv = document.getElementById('teachersGrid');
 
             if (teachers.length === 0) {
-                loadingDiv.innerHTML = '📭 لا يوجد معلمين متاحين حالياً';
+                loadingDiv.innerHTML = window.t('no_teachers');
                 return;
             }
 
@@ -401,9 +405,10 @@
                 .then(data => {
                     if (data.token) { // Registration successful & logged in
                         const teacherInfo = data.teacherIds && data.teacherIds.length > 0
-                            ? ` (تم الربط مع ${data.teacherIds.length} معلم)`
+                            ? window.t('linked_with_teachers').replace('{count}', data.teacherIds.length)
                             : '';
-                        showMessage(`✅ تم تسجيل حساب ${role === 'student' ? 'الطالب' : 'المعلم'} بنجاح!${teacherInfo}`, 'success');
+                        const successMsg = role === 'student' ? window.t('register_success_student') : window.t('register_success_teacher');
+                        showMessage(`${successMsg}${teacherInfo}`, 'success');
 
                         localStorage.setItem('authToken', data.token);
                         localStorage.setItem('currentUser', JSON.stringify({ name, email, role }));
@@ -414,12 +419,12 @@
                             else window.location.href = 'teacher-dashboard.html';
                         }, 1500);
                     } else {
-                        showMessage('❌ ' + (data.message || 'حدث خطأ أثناء التسجيل'), 'error');
+                        showMessage('❌ ' + (data.message || window.t('register_error')), 'error');
                     }
                 })
                 .catch(error => {
                     console.error(error);
-                    showMessage('❌ خطأ في الاتصال بالخادم', 'error');
+                    showMessage('❌ ' + window.t('connection_error'), 'error');
                 });
         }
     </script>
