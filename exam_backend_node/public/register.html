@@ -308,6 +308,7 @@
         // Load teachers on page load
         window.onload = function () {
             loadTeachers();
+            switchTab('student');
         };
 
         function loadTeachers() {
@@ -357,12 +358,24 @@
             tabs.forEach(tab => tab.classList.remove('active'));
             sections.forEach(section => section.classList.remove('active'));
 
+            // Reset required attributes
+            const studentFields = ['studentName', 'studentEmail', 'studentPassword'];
+            const teacherFields = ['teacherName', 'teacherEmail', 'teacherPassword'];
+
             if (type === 'student') {
                 tabs[0].classList.add('active');
                 document.getElementById('student-section').classList.add('active');
+
+                // Set student fields as required, remove from teacher
+                studentFields.forEach(id => document.getElementById(id).required = true);
+                teacherFields.forEach(id => document.getElementById(id).required = false);
             } else {
                 tabs[1].classList.add('active');
                 document.getElementById('teacher-section').classList.add('active');
+
+                // Set teacher fields as required, remove from student
+                teacherFields.forEach(id => document.getElementById(id).required = true);
+                studentFields.forEach(id => document.getElementById(id).required = false);
             }
             hideMessage();
         }

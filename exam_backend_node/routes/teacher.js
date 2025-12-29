@@ -457,12 +457,15 @@ router.get('/statistics', loginRequired('teacher'), async (req, res) => {
             if (!grade) pendingEssays++;
         }
 
+        const totalExams = await Exam.count({ where: examId ? { id: examId } : {} });
+
         res.json({
             totalStudents,
             totalSubmissions,
             averageScore: avgScore,
             passRate,
-            pendingEssays
+            pendingEssays,
+            totalExams
         });
     } catch (error) {
         console.error('Get statistics error:', error);

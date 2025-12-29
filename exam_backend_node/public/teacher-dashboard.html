@@ -189,14 +189,14 @@
         function loadStats() {
             const token = localStorage.getItem('authToken');
 
-            fetch('/api/admin/stats', {
+            fetch('/api/admin/statistics', {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
                 .then(stats => {
-                    document.getElementById('activeExams').textContent = stats.activeExams || 0;
-                    document.getElementById('registeredStudents').textContent = stats.registeredStudents || 0;
-                    document.getElementById('totalAnswers').textContent = stats.totalAnswers || 0;
+                    document.getElementById('activeExams').textContent = stats.totalExams || 0;
+                    document.getElementById('registeredStudents').textContent = stats.totalStudents || 0;
+                    document.getElementById('totalAnswers').textContent = stats.totalSubmissions || 0;
                     document.getElementById('pendingEssays').textContent = stats.pendingEssays || 0;
                 })
                 .catch(err => console.error(err));

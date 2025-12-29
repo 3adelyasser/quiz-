@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const loginRequired = require('../utils/authMiddleware');
 
 const router = express.Router();
+console.log('DEBUG: Loaded admin.js routes');
 
 // Create exam
 router.post('/exams', loginRequired('admin'), async (req, res) => {
@@ -318,12 +319,16 @@ router.get('/statistics', loginRequired('admin'), async (req, res) => {
             if (!grade) pendingEssays++;
         }
 
+        const totalExams = await Exam.count({ where: examId ? { id: examId } : {} });
+        console.log('DEBUG: Statistics called. totalExams:', totalExams);
+
         res.json({
             totalStudents,
             totalSubmissions,
             averageScore: avgScore,
             passRate,
-            pendingEssays
+            pendingEssays,
+            totalExams
         });
     } catch (error) {
         console.error('Get statistics error:', error);
