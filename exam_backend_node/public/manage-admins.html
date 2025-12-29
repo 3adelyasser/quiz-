@@ -232,6 +232,23 @@
             padding: 60px 20px;
             color: #999;
         }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
     </style>
 </head>
 
@@ -248,17 +265,19 @@
                 <button class="add-btn" onclick="openAddModal()" data-i18n="add_admin_btn">➕ إضافة مسؤول جديد</button>
             </div>
 
-            <table class="admins-table" id="adminsTable">
-                <thead>
-                    <tr>
-                        <th data-i18n="th_name">الاسم</th>
-                        <th data-i18n="th_username">اسم المستخدم</th>
-                        <th data-i18n="th_password">كلمة المرور</th>
-                        <th data-i18n="th_actions">الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="adminsBody"></tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="admins-table" id="adminsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_name">الاسم</th>
+                            <th data-i18n="th_username">اسم المستخدم</th>
+                            <th data-i18n="th_password">كلمة المرور</th>
+                            <th data-i18n="th_actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminsBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 

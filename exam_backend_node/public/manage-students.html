@@ -268,6 +268,27 @@
             background: #d4edda;
             color: #155724;
         }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .actions-bar {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
     </style>
 </head>
 
@@ -288,27 +309,29 @@
 
         <div class="content-card">
             <h2 data-i18n="students_list_title">قائمة الطلاب</h2>
-            <table id="studentsTable">
-                <thead>
-                    <tr>
-                        <th data-i18n="th_number">الرقم</th>
-                        <th data-i18n="th_name">الاسم</th>
-                        <th data-i18n="th_email">البريد الإلكتروني</th>
-                        <th data-i18n="th_registration_date">تاريخ التسجيل</th>
-                        <th data-i18n="th_completed_exams">الاختبارات المكتملة</th>
-                        <th data-i18n="th_average_score">المعدل</th>
-                        <th data-i18n="th_actions">الإجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="studentsTableBody">
-                    <tr>
-                        <td colspan="7" class="empty-state">
-                            <div class="empty-state-icon">⏳</div>
-                            <div data-i18n="loading_msg">جاري تحميل البيانات...</div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_number">الرقم</th>
+                            <th data-i18n="th_name">الاسم</th>
+                            <th data-i18n="th_email">البريد الإلكتروني</th>
+                            <th data-i18n="th_registration_date">تاريخ التسجيل</th>
+                            <th data-i18n="th_completed_exams">الاختبارات المكتملة</th>
+                            <th data-i18n="th_average_score">المعدل</th>
+                            <th data-i18n="th_actions">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <div class="empty-state-icon">⏳</div>
+                                <div data-i18n="loading_msg">جاري تحميل البيانات...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

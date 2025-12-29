@@ -163,6 +163,24 @@
             background: #6c757d;
             color: white;
         }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .panel>div {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
     </style>
 </head>
 
@@ -179,23 +197,25 @@
                 <button class="add-btn" onclick="openModal()" data-i18n="add_exam_btn">➕ إضافة اختبار جديد</button>
             </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th data-i18n="th_exam_name">اسم الاختبار</th>
-                        <th data-i18n="th_description">الوصف</th>
-                        <th data-i18n="th_duration">المدة (دقيقة)</th>
-                        <th data-i18n="th_passing_score">درجة النجاح</th>
-                        <th data-i18n="th_created_date">تاريخ الإنشاء</th>
-                        <th data-i18n="th_actions">إجراءات</th>
-                    </tr>
-                </thead>
-                <tbody id="examsBody">
-                    <tr>
-                        <td colspan="6" style="text-align:center" data-i18n="loading">جاري التحميل...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_exam_name">اسم الاختبار</th>
+                            <th data-i18n="th_description">الوصف</th>
+                            <th data-i18n="th_duration">المدة (دقيقة)</th>
+                            <th data-i18n="th_passing_score">درجة النجاح</th>
+                            <th data-i18n="th_created_date">تاريخ الإنشاء</th>
+                            <th data-i18n="th_actions">إجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examsBody">
+                        <tr>
+                            <td colspan="6" style="text-align:center" data-i18n="loading">جاري التحميل...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

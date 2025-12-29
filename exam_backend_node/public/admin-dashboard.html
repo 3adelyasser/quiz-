@@ -241,10 +241,20 @@
         }
 
         @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
 
             .stats-grid,
             .action-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .panel-header {
+                flex-direction: column;
+                gap: 15px;
             }
         }
     </style>
@@ -318,25 +328,33 @@
 
         <!-- Recent Results -->
         <div class="panel">
+            <style>
+                .table-responsive {
+                    overflow-x: auto;
+                }
+            </style>
             <h2 data-i18n="recent_results_title">📊 نتائج الطلاب الأخيرة</h2>
-            <table class="results-table" id="resultsTable">
-                <thead>
-                    <tr>
-                        <th data-i18n="th_student">الطالب</th>
-                        <th data-i18n="th_auto_score">الدرجة التلقائية</th>
-                        <th data-i18n="th_essay_score">درجة المقاليات</th>
-                        <th data-i18n="th_final_score">الدرجة النهائية</th>
-                        <th data-i18n="th_status">الحالة</th>
-                        <th data-i18n="th_date">التاريخ</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsBody">
-                    <tr>
-                        <td colspan="6" style="text-align: center; color: #999;" data-i18n="no_results">لا توجد نتائج
-                            بعد</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="results-table" id="resultsTable">
+                    <thead>
+                        <tr>
+                            <th data-i18n="th_student">الطالب</th>
+                            <th data-i18n="th_auto_score">الدرجة التلقائية</th>
+                            <th data-i18n="th_essay_score">درجة المقاليات</th>
+                            <th data-i18n="th_final_score">الدرجة النهائية</th>
+                            <th data-i18n="th_status">الحالة</th>
+                            <th data-i18n="th_date">التاريخ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsBody">
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #999;" data-i18n="no_results">لا توجد
+                                نتائج
+                                بعد</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 

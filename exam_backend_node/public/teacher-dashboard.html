@@ -74,6 +74,27 @@
             margin-bottom: 10px;
         }
 
+        .stat-card .label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-bar {
+                justify-content: center;
+            }
+        }
+
         .stat-label {
             color: #666;
             font-size: 16px;
