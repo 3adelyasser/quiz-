@@ -262,7 +262,7 @@
 
         function loadExams() {
             const token = localStorage.getItem('authToken');
-            fetch('/api/exams', {
+            fetch('/api/teacher/exams', {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -331,7 +331,7 @@
                 passing_score: document.getElementById('passingScore').value
             };
 
-            const url = editingId ? `/api/exams/${editingId}` : '/api/exams';
+            const url = editingId ? `/api/teacher/exams/${editingId}` : '/api/teacher/exams';
             const method = editingId ? 'PUT' : 'POST';
 
             fetch(url, {
@@ -358,7 +358,7 @@
         function deleteExam(id) {
             if (!confirm(window.t('confirm_delete'))) return;
             const token = localStorage.getItem('authToken');
-            fetch(`/api/exams/${id}`, {
+            fetch(`/api/teacher/exams/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             })

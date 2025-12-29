@@ -228,7 +228,7 @@
             // I will assume for now I need to add it, or use the `GET /exams` list if it included questions (it didn't).
             // I will add GET /exams/:id/questions to teacher.js in next step. For now I write the fetch code.
 
-            fetch(`/api/exams/${examId}/questions`, {
+            fetch(`/api/teacher/exams/${examId}/questions`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -322,7 +322,7 @@
         function deleteQuestion(id) {
             if (!confirm('حذف؟')) return;
             // Call API DELETE
-            fetch(`/api/exams/${examId}/questions/${id}`, {
+            fetch(`/api/teacher/exams/${examId}/questions/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
             }).then(() => loadQuestions());
@@ -348,7 +348,7 @@
                 payload.correctAnswer = document.getElementById('correctAnswerNum').value;
             }
 
-            const url = editingId ? `/api/exams/${examId}/questions/${editingId}` : `/api/exams/${examId}/questions`;
+            const url = editingId ? `/api/teacher/exams/${examId}/questions/${editingId}` : `/api/teacher/exams/${examId}/questions`;
             const method = editingId ? 'PUT' : 'POST';
 
             fetch(url, {

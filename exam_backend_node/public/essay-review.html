@@ -246,7 +246,7 @@
         function loadSubmissions() {
             const token = localStorage.getItem('authToken');
 
-            fetch('/api/admin/essay-submissions', {
+            fetch('/api/teacher/essay-reviews', {
                 headers: { 'Authorization': `Bearer ${token}` }
             })
                 .then(res => res.json())
@@ -277,37 +277,33 @@
                 const card = document.createElement('div');
                 card.className = `submission-card ${isGraded ? 'graded' : ''}`;
 
-                let questionsHtml = '';
-                sub.answers.forEach(ans => {
-                    questionsHtml += `
+                let questionsHtml = `
                         <div class="question-block">
-                            <div class="question-text">Q: ${ans.questionText || window.t('question')}</div>
+                            <div class="question-text">Q: ${sub.questionText || window.t('question')}</div>
                             <div class="student-answer">
                                 <strong>${window.t('student_answer_label')}</strong><br>
-                                ${ans.answerText || window.t('not_answered')}
+                                ${sub.studentAnswer || window.t('not_answered')}
                             </div>
                             <div class="grading-area">
                                 <div>
                                     <label>${window.t('grade_label')}</label><br>
                                     <input type="number" 
                                            class="grade-input" 
-                                           id="grade-${sub.submissionId}-${ans.questionId}" 
-                                           value="${ans.grade !== null ? ans.grade : ''}" 
-                                           min="0" max="${ans.maxScore || 10}">
-                                           <span style="font-size: 12px; color: #666">/ ${ans.maxScore || 10}</span>
+                                           id="grade-${sub.submissionId}" 
+                                           value="${sub.currentScore !== null ? sub.currentScore : ''}" 
+                                           min="0">
                                 </div>
                                 <div style="flex: 1;">
                                     <label>${window.t('comment_label')}</label><br>
                                     <input type="text" 
                                            class="comment-input" 
-                                           id="comment-${sub.submissionId}-${ans.questionId}" 
-                                           value="${ans.comment || ''}" 
+                                           id="comment-${sub.submissionId}" 
+                                           value="${sub.comment || ''}" 
                                            placeholder="${window.t('comment_placeholder')}">
                                 </div>
                             </div>
                         </div>
                     `;
-                });
 
                 card.innerHTML = `
                     <div class="student-info">
@@ -337,9 +333,9 @@
             if (filter === 'all') {
                 filtered = allSubmissions;
             } else if (filter === 'pending') {
-                filtered = allSubmissions.filter(s => s.status === 'pending');
+                filtered = allSubmissions.filter(s => s.status === 'Pending');
             } else if (filter === 'graded') {
-                filtered = allSubmissions.filter(s => s.status === 'graded');
+                filtered = allSubmissions.filter(s => s.status === 'Graded');
             }
             renderSubmissions(filtered);
         }
@@ -348,43 +344,26 @@
             const sub = allSubmissions.find(s => s.submissionId === submissionId);
             if (!sub) return;
 
-            const grades = [];
-            let isValid = true;
+            const gradeInput = document.getElementById(`grade-${submissionId}`);
+            const commentInput = document.getElementById(`comment-${submissionId}`);
 
-            sub.answers.forEach(ans => {
-                const gradeInput = document.getElementById(`grade-${submissionId}-${ans.questionId}`);
-                const commentInput = document.getElementById(`comment-${submissionId}-${ans.questionId}`);
+            const gradeVal = parseFloat(gradeInput.value);
 
-                const gradeVal = parseFloat(gradeInput.value);
-
-                if (isNaN(gradeVal) || gradeVal < 0) {
-                    isValid = false;
-                    gradeInput.style.borderColor = 'red';
-                } else {
-                    gradeInput.style.borderColor = '#cbd5e0';
-                    grades.push({
-                        questionId: ans.questionId,
-                        grade: gradeVal,
-                        comment: commentInput.value.trim()
-                    });
-                }
-            });
-
-            if (!isValid) {
+            if (isNaN(gradeVal) || gradeVal < 0) {
                 alert(window.t('invalid_grade_error'));
                 return;
             }
 
             const token = localStorage.getItem('authToken');
-            fetch('/api/admin/grade-essay', {
+            fetch(`/api/teacher/essay-reviews/${submissionId}/grade`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify({
-                    submissionId: submissionId,
-                    grades: grades
+                    score: gradeVal,
+                    comment: commentInput.value.trim()
                 })
             })
                 .then(res => res.json())
