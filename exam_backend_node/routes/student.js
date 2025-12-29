@@ -55,74 +55,71 @@ router.post('/exams/:id/submit', loginRequired('student'), async (req, res) => {
         const questions = await Question.findAll({ where: { exam_id: examId } });
 
         let autoScore = 0;
-        let totalAuto = 0;
-        let essayAnswers = [];
-        let essayGrades = [];
+        let totalScore = 0;
+        let hasEssays = false;
 
         questions.forEach(q => {
-            const studentAnswer = answers[q.id];
-
+            totalScore += q.points;
             if (q.question_type === 'essay') {
-                essayAnswers.push({
-                    questionId: q.id,
-                    questionText: q.question_text,
-                    answer: studentAnswer || '',
-                    points: q.points
-                });
-                essayGrades.push({
-                    questionId: q.id,
-                    grade: null, // Pending
-                    feedback: ''
-                });
+                hasEssays = true;
             } else {
-                totalAuto += q.points;
-                // Auto grading
+                const studentAnswer = answers[q.id];
                 let isCorrect = false;
                 if (q.question_type === 'multiple-choice') {
-                    // correct_answer might be the text or index. My model stores text in correct_answer or I check options. 
-                    // Wait, my Question model setup:
-                    // options: JSON array of objects {text, correct}. 
-                    // correct_answer: string (optional fallback or for calc).
-
                     if (q.options) {
                         const correctOpt = q.options.find(o => o.correct);
-                        if (correctOpt && correctOpt.text === studentAnswer) isCorrect = true;
+                        if (correctOpt && (correctOpt.text === studentAnswer)) isCorrect = true;
                     }
-                } else if (q.question_type === 'calculation') {
+                } else if (q.question_type === 'calculation' || q.question_type === 'numerical') {
                     if (parseFloat(studentAnswer) === parseFloat(q.correct_answer)) isCorrect = true;
                 }
-
                 if (isCorrect) autoScore += q.points;
             }
         });
 
-        // Save Result
+        // Create Result
         const result = await Result.create({
             student_id: studentId,
             exam_id: examId,
             teacher_id: exam.created_by,
-            score: autoScore, // Initial score (auto only)
-            total_score: totalAuto, // Total points for auto questions? Or total exam points?
-            // Actually Result model has `scores` JSON? 
-            // Let's check Result model again.
-            // Model: student_id, exam_id, teacher_id, scores (JSON), submission_time, status.
-            // `scores` probably stores the breakdown.
-            // I should use `scores` field for detailed breakdown.
-            scores: {
-                autoScore,
-                totalAuto,
-                answers,
-                essayAnswers,
-                essayGrades
-            },
-            status: essayAnswers.length > 0 ? 'pending' : 'graded'
+            auto_score: autoScore,
+            final_score: autoScore,
+            is_graded: !hasEssays,
+            submission_time: new Date()
         });
+
+        // Create Submissions
+        const { Submission } = require('../models');
+        const submissionData = questions.map(q => {
+            const studentAnswer = answers[q.id];
+            let isCorrect = null;
+            if (q.question_type !== 'essay') {
+                isCorrect = false;
+                if (q.question_type === 'multiple-choice') {
+                    if (q.options) {
+                        const correctOpt = q.options.find(o => o.correct);
+                        if (correctOpt && (correctOpt.text === studentAnswer)) isCorrect = true;
+                    }
+                } else if (q.question_type === 'calculation' || q.question_type === 'numerical') {
+                    if (parseFloat(studentAnswer) === parseFloat(q.correct_answer)) isCorrect = true;
+                }
+            }
+            return {
+                result_id: result.id,
+                question_id: q.id,
+                student_answer: studentAnswer ? studentAnswer.toString() : '',
+                answer_type: q.question_type,
+                is_correct: isCorrect
+            };
+        });
+
+        await Submission.bulkCreate(submissionData);
 
         res.json({
             message: 'Exam submitted successfully',
             resultId: result.id,
             autoScore,
-            status: result.status
+            is_graded: result.is_graded
         });
 
     } catch (error) {
@@ -184,6 +181,46 @@ router.post('/teachers/select', loginRequired('student'), async (req, res) => {
 
     } catch (error) {
         console.error('Select teachers error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get student results
+router.get('/results', loginRequired('student'), async (req, res) => {
+    try {
+        const studentId = req.currentUser.id;
+        const results = await Result.findAll({
+            where: { student_id: studentId },
+            include: [
+                {
+                    model: Exam,
+                    as: 'exam',
+                    attributes: ['title', 'description', 'passing_score'],
+                    include: [{
+                        model: Question,
+                        as: 'questions',
+                        attributes: ['points']
+                    }]
+                }
+            ],
+            order: [['submission_time', 'DESC']]
+        });
+
+        // Calculate total_score for each result
+        const output = results.map(r => {
+            const resultJson = r.toJSON();
+            if (resultJson.exam && resultJson.exam.questions) {
+                resultJson.total_score = resultJson.exam.questions.reduce((sum, q) => sum + q.points, 0);
+                delete resultJson.exam.questions;
+            } else {
+                resultJson.total_score = 0;
+            }
+            return resultJson;
+        });
+
+        res.json(output);
+    } catch (error) {
+        console.error('Get student results error:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

@@ -276,38 +276,35 @@
         };
 
         function loadStats() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const allResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+            const token = localStorage.getItem('authToken');
+            fetch('/api/students/results', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => res.json())
+                .then(results => {
+                    document.getElementById('completedExams').textContent = results.length;
 
-            // Filter student results
-            const studentResults = allResults.filter(r => r.studentName === currentUser.name);
+                    if (results.length > 0) {
+                        const gradedResults = results.filter(r => r.is_graded);
+                        const pendingResults = results.filter(r => !r.is_graded);
 
-            // Update stats
-            document.getElementById('completedExams').textContent = studentResults.length;
+                        document.getElementById('pendingGrades').textContent = pendingResults.length;
 
-            if (studentResults.length > 0) {
-                // Calculate average
-                const totalScore = studentResults.reduce((sum, r) => sum + (r.finalScore || r.autoScore), 0);
-                const totalPossible = studentResults.reduce((sum, r) => sum + r.totalAuto, 0);
-                const avgPercentage = ((totalScore / totalPossible) * 100).toFixed(1);
-                document.getElementById('avgScore').textContent = avgPercentage + '%';
+                        if (gradedResults.length > 0) {
+                            const totalScore = gradedResults.reduce((sum, r) => sum + r.final_score, 0);
+                            const totalPossible = gradedResults.reduce((sum, r) => sum + r.total_score, 0);
+                            const avgPercentage = totalPossible > 0 ? ((totalScore / totalPossible) * 100).toFixed(1) : 0;
+                            document.getElementById('avgScore').textContent = avgPercentage + '%';
+                        }
 
-                // Count pending essays
-                const pendingCount = studentResults.filter(r => {
-                    const hasEssays = r.essayAnswers && r.essayAnswers.length > 0;
-                    const isGraded = r.essayGrades && r.essayGrades.some(g => g.grade != null);
-                    return hasEssays && !isGraded;
-                }).length;
-
-                document.getElementById('pendingGrades').textContent = pendingCount;
-
-                // Show info banner if there are pending grades
-                if (pendingCount > 0) {
-                    document.getElementById('infoBanner').style.display = 'block';
-                    document.getElementById('infoText').textContent =
-                        window.t('pending_grading_msg').replace('{count}', pendingCount);
-                }
-            }
+                        if (pendingResults.length > 0) {
+                            document.getElementById('infoBanner').style.display = 'block';
+                            document.getElementById('infoText').textContent =
+                                window.t('pending_grading_msg').replace('{count}', pendingResults.length);
+                        }
+                    }
+                })
+                .catch(err => console.error('Load stats error:', err));
         }
 
         function logout() {

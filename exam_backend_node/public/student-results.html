@@ -174,111 +174,81 @@
         }
 
         function loadResults() {
-            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-            const allResults = JSON.parse(localStorage.getItem('quizResults') || '[]');
+            const token = localStorage.getItem('authToken');
+            fetch('/api/students/results', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+                .then(res => res.json())
+                .then(results => {
+                    const container = document.getElementById('resultsContainer');
+                    if (results.length === 0) {
+                        container.innerHTML = `
+                        <div class="pending-message">
+                            <h3>${window.t('no_results_msg')}</h3>
+                            <p>${window.t('solve_exam_first')}</p>
+                        </div>
+                    `;
+                        return;
+                    }
 
-            // Find student's latest result
-            const studentResults = allResults.filter(r => r.studentName === currentUser.name);
-
-            if (studentResults.length === 0) {
-                document.getElementById('resultsContainer').innerHTML = `
-                    <div class="pending-message">
-                        <h3>${window.t('no_results_msg')}</h3>
-                        <p>${window.t('solve_exam_first')}</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Get latest result
-            const result = studentResults[studentResults.length - 1];
-            displayResult(result);
+                    container.innerHTML = results.map(result => renderResultCard(result)).join('');
+                })
+                .catch(err => console.error('Load results error:', err));
         }
 
-        function displayResult(result) {
-            const container = document.getElementById('resultsContainer');
-
-            const hasEssays = result.essayAnswers && result.essayAnswers.length > 0;
-            const isGraded = result.essayGrades && result.essayGrades.some(g => g.grade != null);
-            const totalEssayScore = result.essayGrades ? result.essayGrades.reduce((sum, g) => sum + (g.grade || 0), 0) : 0;
-            const finalScore = result.finalScore || result.autoScore;
+        function renderResultCard(result) {
+            const scores = result.scores || {};
+            const isPending = result.status === 'pending';
+            const passingScore = result.exam ? result.exam.passing_score : 50;
+            const passed = result.score >= passingScore;
 
             let html = `
                 <div class="final-results">
-                    <h2 data-i18n="final_result_title">${window.t('final_result_title')}</h2>
+                    <h2 style="margin-bottom: 15px;">${result.exam ? result.exam.title : 'Exam'}</h2>
                     
                     <div class="score-breakdown">
-                        <p>${window.t('auto_score_label')} ${result.autoScore} / ${result.totalAuto}</p>
+                        <p>${window.t('auto_score_label')} ${scores.autoScore || 0} / ${scores.totalAuto || 0}</p>
             `;
 
-            if (hasEssays) {
-                if (isGraded) {
-                    html += `
-                        <p>${window.t('essay_score_label')} ${totalEssayScore.toFixed(1)}</p>
-                        <hr style="border: none; border-top: 2px solid #e0e0e0; margin: 15px 0;">
-                        <p class="final">${window.t('final_score_label')} ${finalScore.toFixed(1)}</p>
-                    `;
-                } else {
-                    html += `
-                        <p style="color: #ff9800;">${window.t('essay_pending_msg')}</p>
-                    `;
-                }
+            if (isPending) {
+                html += `
+                    <p style="color: #ff9800;">${window.t('essay_pending_msg')}</p>
+                    <div class="status-badge status-pending">${window.t('pending_grading')}</div>
+                `;
             } else {
                 html += `
-                    <p class="final">${window.t('final_score_label')} ${finalScore.toFixed(1)} <span style="font-size: 0.8em; color: #666;">${window.t('out_of')} ${result.examTotalScore || 100}</span></p>
-                    <div class="status-badge ${result.passed ? 'status-pass' : 'status-fail'}">
-                        ${result.passed ? window.t('status_pass') : window.t('status_fail')}
+                    <p class="final">${window.t('final_score_label')} ${result.score} / ${result.total_score}</p>
+                    <div class="status-badge ${passed ? 'status-pass' : 'status-fail'}">
+                        ${passed ? window.t('status_pass') : window.t('status_fail')}
                     </div>
                 `;
             }
 
-            html += `
-                    </div>
-            `;
-
-            // Show teacher feedback if graded
-            if (hasEssays && isGraded) {
+            if (scores.essayGrades && scores.essayGrades.length > 0) {
                 html += `
                     <div class="teacher-feedback">
                         <h3>${window.t('teacher_feedback_title')}</h3>
-                `;
-
-                result.essayGrades.forEach(grade => {
-                    const essay = result.essayAnswers.find(e => e.questionId === grade.questionId);
-                    if (grade.grade != null) {
-                        html += `
-                            <div class="essay-grade">
-                                <strong>Q${grade.questionId}: ${essay?.questionText || ''}</strong>
-                                <p>${window.t('your_score')} ${grade.grade}</p>
-                                ${grade.comment ? `<p class="comment">💬 ${grade.comment}</p>` : ''}
-                            </div>
-                        `;
-                    }
-                });
-
-                html += `
-                    </div>
-                `;
-            }
-
-            // Show pending message if not graded yet
-            if (hasEssays && !isGraded) {
-                html += `
-                    <div class="pending-message">
-                        <h3>${window.t('pending_grading_title')}</h3>
-                        <p>${window.t('pending_grading_msg')}</p>
-                        <p style="margin-top: 10px; font-size: 14px;">
-                            ${window.t('submission_date')} ${new Date(result.timestamp).toLocaleString('ar-EG')}
-                        </p>
+                        ${scores.essayGrades.map(grade => {
+                    const essay = scores.essayAnswers ? scores.essayAnswers.find(e => e.questionId === grade.questionId) : null;
+                    return `
+                                <div class="essay-grade">
+                                    <strong>${essay ? essay.questionText : 'Essay Question'}</strong>
+                                    <p>${window.t('your_score')} ${grade.grade !== null ? grade.grade : 'Waiting...'}</p>
+                                    ${grade.comment ? `<p class="comment">💬 ${grade.comment}</p>` : ''}
+                                </div>
+                            `;
+                }).join('')}
                     </div>
                 `;
             }
 
             html += `
+                    <p style="margin-top: 15px; font-size: 12px; color: #999;">
+                        ${window.t('submission_date')} ${new Date(result.submission_time).toLocaleString('ar-EG')}
+                    </p>
                 </div>
             `;
-
-            container.innerHTML = html;
+            return html;
         }
     </script>
 </body>
